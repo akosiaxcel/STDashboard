@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
-import styles from './Dashboard.module.css'; // Correctly import the CSS module
+import React, { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+import styles from "./Dashboard.module.css"; // Correctly import the CSS module
 
 function Dashboard() {
   const [data, setData] = useState([]);
@@ -10,7 +10,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       const querySnapshot = await getDocs(collection(db, "questions"));
-      const dataList = querySnapshot.docs.map(doc => doc.data());
+      const dataList = querySnapshot.docs.map((doc) => doc.data());
       setData(dataList);
       setLoading(false);
     };
@@ -19,7 +19,7 @@ function Dashboard() {
   }, []);
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <h1>Fetching data...</h1>;
   }
 
   return (
@@ -38,7 +38,7 @@ function Dashboard() {
             <tr key={index}>
               <td>{item.question}</td>
               <td>{item.source}</td>
-              <td>{item.options.join(', ')}</td>
+              <td>{item.options.join(", ")}</td>
             </tr>
           ))}
         </tbody>
