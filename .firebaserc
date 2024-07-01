@@ -1,5 +1,16 @@
 {
   "projects": {
     "default": "screening-test-760d6"
-  }
+  },
+  "targets": {
+    "screening-test-760d6": {
+      "hosting": {
+        "screening-dashboard": [
+          "screening-dashboard"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
