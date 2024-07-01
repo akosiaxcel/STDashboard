@@ -22,6 +22,9 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  const handleSignInClick = () => setShowSignUp(false);
+  const handleSignUpClick = () => setShowSignUp(true);
+
   if (loading) {
     return <h1>Loading...</h1>;
   }
@@ -31,10 +34,10 @@ function App() {
   }
 
   if (showSignUp) {
-    return <SignUp />;
+    return <SignUp onSignInClick={handleSignInClick} />;
   }
 
-  return <SignIn onSignUpClick={() => setShowSignUp(true)} />;
+  return <SignIn onSignUpClick={handleSignUpClick} />;
 }
 
 const container = document.getElementById('root');
