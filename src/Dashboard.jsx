@@ -9,6 +9,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchId, setSearchId] = useState("");
+  const [searchError, setSearchError] = useState(null);
   const [searchResult, setSearchResult] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -28,7 +29,10 @@ function Dashboard() {
         const querySnapshot = await getDocs(
           collection(db, `users/${userId}/selectedOptions`)
         );
-        const dataList = querySnapshot.docs.map((doc) => doc.data());
+        const dataList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         setData(dataList);
       } catch (error) {
         setError("Error fetching data");
@@ -51,8 +55,20 @@ function Dashboard() {
   };
 
   const handleSearch = () => {
+    if (!searchId) {
+      setSearchError("Please enter a User ID");
+      return;
+    }
+
     const result = data.find((item) => item.id === searchId);
     setSearchResult(result || "No data found");
+    setSearchError(null); // Clear previous error
+  };
+
+  const handleClearSearch = () => {
+    setSearchId("");
+    setSearchResult(null);
+    setSearchError(null); // Clear previous error
   };
 
   if (loading) {
@@ -74,7 +90,10 @@ function Dashboard() {
         </button>
       </div>
       <h1>Your Dashboard</h1>
-      <button onClick={() => setShowSearch(!showSearch)} className={styles.searchButton}>
+      <button
+        onClick={() => setShowSearch(!showSearch)}
+        className={styles.searchButton}
+      >
         {showSearch ? "Hide Search" : "Show Search"}
       </button>
       {showSearch && (
@@ -82,13 +101,20 @@ function Dashboard() {
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Enter ID"
+            placeholder="Enter User ID"
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
           />
           <button onClick={handleSearch} className={styles.searchButton}>
             Search
           </button>
+          <button
+            onClick={handleClearSearch}
+            className={styles.clearButton}
+          >
+            Clear Search
+          </button>
+          {searchError && <p className={styles.error}>{searchError}</p>}
         </div>
       )}
       {searchResult && (
@@ -112,39 +138,15 @@ function Dashboard() {
                   <td>{searchResult.source}</td>
                   <td>{searchResult.option}</td>
                   <td>
-                    {new Date(searchResult.timestamp.seconds * 1000).toLocaleString()}
+                    {new Date(
+                      searchResult.timestamp.seconds * 1000
+                    ).toLocaleString()}
                   </td>
                 </tr>
               </tbody>
             </table>
           )}
         </div>
-      )}
-      {data.length === 0 ? (
-        <h2>No Data</h2>
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Question</th>
-              <th>Source</th>
-              <th>Option</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.question}</td>
-                <td>{item.source}</td>
-                <td>{item.option}</td>
-                <td>
-                  {new Date(item.timestamp.seconds * 1000).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       )}
     </div>
   );

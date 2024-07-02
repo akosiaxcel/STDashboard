@@ -146,7 +146,7 @@ h2 {
   }
 
   .logoutButton {
-    width: 100%;
+    width: 30%;
     margin-bottom: 10px;
   }
 
@@ -162,7 +162,7 @@ h2 {
   }
 
   .searchButton {
-    width: 100%;
+    width: 30%;
   }
 
   .table th, .table td {
