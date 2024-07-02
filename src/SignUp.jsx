@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import styles from "./SignUp.module.css";
 
-function SignUp() {
+function SignUp({ onSignInClick }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -15,14 +15,23 @@ function SignUp() {
       await createUserWithEmailAndPassword(auth, email, password);
       // Redirect to sign in or directly to dashboard
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/email-already-in-use") {
+        setError("Email already in use. Please sign in.");
+      } else {
+        setError(err.message);
+      }
     }
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        <img src="https://www.scaleupconsulting.com.au/wp-content/uploads/2022/05/ScaleupConsulting_Logo_Primary-3.png" alt="Company Logo" className={styles.logo} />
+        <img
+          src="https://www.scaleupconsulting.com.au/wp-content/uploads/2022/05/ScaleupConsulting_Logo_Primary-3.png"
+          alt="Company Logo"
+          className={styles.logo}
+        />
+        <h2>Screening Test</h2>
       </div>
       <div className={styles.right}>
         <div className={styles.signUp}>
@@ -42,8 +51,13 @@ function SignUp() {
             />
             <button type="submit">Sign Up</button>
             {error && <p className={styles.error}>{error}</p>}
-            <p>Already have an account? <a href="/sign-in">Sign In</a></p>
           </form>
+          <p>
+            Already have an account?{" "}
+            <button onClick={onSignInClick} className={styles.linkButton}>
+              Sign In
+            </button>
+          </p>
         </div>
       </div>
     </div>

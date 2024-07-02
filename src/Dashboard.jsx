@@ -92,7 +92,7 @@ function Dashboard() {
       <h1>Your Dashboard</h1>
       <button
         onClick={() => setShowSearch(!showSearch)}
-        className={styles.searchButton}
+        className={styles.toggleSearchButton}
       >
         {showSearch ? "Hide Search" : "Show Search"}
       </button>
@@ -108,10 +108,7 @@ function Dashboard() {
           <button onClick={handleSearch} className={styles.searchButton}>
             Search
           </button>
-          <button
-            onClick={handleClearSearch}
-            className={styles.clearButton}
-          >
+          <button onClick={handleClearSearch} className={styles.clearButton}>
             Clear Search
           </button>
           {searchError && <p className={styles.error}>{searchError}</p>}

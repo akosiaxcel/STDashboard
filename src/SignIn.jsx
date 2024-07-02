@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import styles from "./SignIn.module.css";
 
-function SignIn() {
+function SignIn({ onSignUpClick }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ function SignIn() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Redirect to dashboard
+      // Redirect to dashboard or do something on successful login
     } catch (err) {
       setError(err.message);
     }
@@ -22,7 +22,12 @@ function SignIn() {
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        <img src="https://www.scaleupconsulting.com.au/wp-content/uploads/2022/05/ScaleupConsulting_Logo_Primary-3.png" alt="Company Logo" className={styles.logo} />
+        <img
+          src="https://www.scaleupconsulting.com.au/wp-content/uploads/2022/05/ScaleupConsulting_Logo_Primary-3.png"
+          alt="Company Logo"
+          className={styles.logo}
+        />
+        <h2>Screening Test</h2>
       </div>
       <div className={styles.right}>
         <div className={styles.signIn}>
@@ -42,8 +47,10 @@ function SignIn() {
             />
             <button type="submit">Sign In</button>
             {error && <p className={styles.error}>{error}</p>}
-            <p>Don't have an account? <a href="/sign-up">Sign Up</a></p>
           </form>
+          <p>
+            Don't have an account? <button onClick={onSignUpClick}>Sign Up</button>
+          </p>
         </div>
       </div>
     </div>

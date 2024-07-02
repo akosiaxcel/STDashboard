@@ -14,7 +14,6 @@
 .logo {
   max-width: 80%;
   height: auto;
-  filter: none; /* Ensure no color filter is applied */
 }
 
 .right {
@@ -56,9 +55,30 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  background-color: darken(var(--e-global-color-accent), 10%);
+}
+
 .error {
   color: red;
   margin-top: 10px;
+}
+
+p {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--e-global-color-primary);
+  cursor: pointer;
+  font-family: var(--e-global-typography-primary-font-family);
+}
+
+.linkButton:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
