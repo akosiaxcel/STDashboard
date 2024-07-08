@@ -1,6 +1,8 @@
+/* SignIn.module.css */
+
 .container {
   display: flex;
-  height: 100vh;
+  height:100vh;
 }
 
 .left {
@@ -79,6 +81,16 @@ p button {
 
 p button:hover {
   text-decoration: underline;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.rememberMe input {
+  margin-right: 10px;
 }
 
 @media (max-width: 768px) {

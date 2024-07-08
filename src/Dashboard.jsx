@@ -24,18 +24,29 @@ function Dashboard() {
         return;
       }
 
+      const userId = user.uid;
+      console.log("Authenticated User ID:", userId); // Log user ID
+
       try {
-        const userId = user.uid;
-        const querySnapshot = await getDocs(
-          collection(db, `users/${userId}/selectedOptions`)
-        );
-        const dataList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setData(dataList);
+        const querySnapshot = await getDocs(collection(db, `users/${userId}/selectedOptions`));
+
+        if (querySnapshot.empty) {
+          console.log("No documents found in the collection.");
+          setData([]); // Ensure data is set to an empty array if no documents are found
+        } else {
+          console.log("Documents found in the collection.");
+          const dataList = querySnapshot.docs.map((doc) => {
+            console.log("Document Data:", doc.data()); // Log document data
+            return {
+              id: doc.id,
+              ...doc.data(),
+            };
+          });
+          console.log("Fetched Data List:", dataList); // Log fetched data list
+          setData(dataList);
+        }
       } catch (error) {
-        setError("Error fetching data");
+        setError(`Error fetching data: ${error.message}`);
         console.error("Error fetching data: ", error);
       } finally {
         setLoading(false);
@@ -60,7 +71,12 @@ function Dashboard() {
       return;
     }
 
+    console.log("Searching for ID:", searchId);
+    console.log("Current Data:", data);
+
     const result = data.find((item) => item.id === searchId);
+    console.log("Search Result:", result);
+
     setSearchResult(result || "No data found");
     setSearchError(null); // Clear previous error
   };
@@ -136,7 +152,7 @@ function Dashboard() {
                   <td>{searchResult.option}</td>
                   <td>
                     {new Date(
-                      searchResult.timestamp.seconds * 1000
+                      searchResult.timestamp.seconds * 1000,
                     ).toLocaleString()}
                   </td>
                 </tr>
@@ -145,6 +161,33 @@ function Dashboard() {
           )}
         </div>
       )}
+      <div className={styles.dataSection}>
+        <h3>All Data</h3>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Question</th>
+              <th>Source</th>
+              <th>Option</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.question}</td>
+                <td>{item.source}</td>
+                <td>{item.option}</td>
+                <td>
+                  {new Date(item.timestamp.seconds * 1000).toLocaleString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { Link as MuiLink, Typography } from "@mui/material";
 import styles from "./SignUp.module.css";
+import { styled } from "@mui/system";
 
 function SignUp({ onSignInClick }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+
+  const CustomLink = styled(MuiLink)({
+    textDecoration: "none",
+    color: "inherit",
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +38,13 @@ function SignUp({ onSignInClick }) {
           alt="Company Logo"
           className={styles.logo}
         />
-        <h2>Screening Test</h2>
+        <CustomLink
+          href="https://screening-test.scaleupconsulting.com.au/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Typography variant="h5">Screening Test</Typography>
+        </CustomLink>
       </div>
       <div className={styles.right}>
         <div className={styles.signUp}>
