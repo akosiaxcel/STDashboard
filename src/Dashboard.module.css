@@ -4,13 +4,17 @@
   --text-color: #7A7A7A;
   --accent-color: #2B7EDE;
   --additional-color1: #002857;
+  --error-color: #ff4c4c;
   --font-family-primary: "Poppins", sans-serif;
+  --background-color: #f4f4f4;
+  --white: #ffffff;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
   font-family: var(--font-family-primary);
   color: var(--text-color);
-  background-color: #f4f4f4;
+  background-color: var(--background-color);
   margin: 0;
   padding: 0;
 }
@@ -19,9 +23,9 @@ body {
   padding: 40px;
   max-width: 1200px;
   margin: 40px auto;
-  background-color: white;
+  background-color: var(--white);
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
 }
 
 .header {
@@ -38,14 +42,14 @@ body {
 
 .logoutButton {
   padding: 10px 20px;
-  width: 20%;
   font-size: 16px;
   background-color: var(--accent-color);
-  color: white;
+  color: var(--white);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
+  width: 16%;
 }
 
 .logoutButton:hover {
@@ -57,50 +61,56 @@ h1 {
   margin: 0 0 20px;
 }
 
-.toggleSearchButton {
-  padding: 10px 20px;
-  width: 20%;
-  font-size: 16px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 20px;
-}
-
-.toggleSearchButton:hover {
-  background-color: var(--secondary-color);
-}
-
 .searchSection {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
 }
 
 .searchInput {
   padding: 10px;
   font-size: 16px;
   flex: 1;
-  margin-right: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  width: 100%;
+  padding-right: 30px; /* Add padding to the right for the clear button */
+}
+
+.clearInputButton {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #888;
+}
+
+.clearInputButton:hover {
+  color: var(--text-color);
 }
 
 .searchButton,
 .clearButton {
   padding: 10px 20px;
-  width: 20%;
   font-size: 16px;
-  color: white;
+  color: var(--white);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-left: 10px;
+  margin-top: 10px;
+  width: 24%;
 }
 
 .searchButton {
@@ -135,7 +145,7 @@ h1 {
 
 .table th {
   background-color: var(--secondary-color);
-  color: white;
+  color: var(--white);
   font-weight: normal;
 }
 
@@ -153,11 +163,49 @@ h1 {
 
 .searchResult {
   margin-top: 20px;
+  padding: 20px;
+  background-color: var(--background-color);
+  border-radius: 5px;
+  box-shadow: var(--box-shadow);
 }
 
-.searchResult h3 {
-  margin-bottom: 10px;
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resultHeader h3 {
+  margin: 0;
   color: var(--primary-color);
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--error-color);
+  width: 16%;
+}
+
+.deleteButton:hover {
+  color: darkred;
+  background: transparent;
+}
+
+.error {
+  color: var(--error-color);
+  background-color: #ffe4e4;
+  border: 1px solid var(--error-color);
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+.multipleId {
+  font-size: 12px;
+  color: var(--text-color);
+  text-decoration: "italic"
 }
 
 /* Responsive Design */
@@ -177,22 +225,21 @@ h1 {
   }
 
   .searchSection {
-    flex-direction: column;
     align-items: stretch;
   }
 
   .searchInput {
     margin-right: 0;
     margin-bottom: 10px;
-    width: 100%;
   }
 
   .searchButton,
   .clearButton {
-    width: 30%;
+    width: auto;
   }
 
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 8px;
   }
 }
@@ -207,7 +254,6 @@ h1 {
   }
 
   .logoutButton,
-  .toggleSearchButton,
   .searchButton,
   .clearButton {
     font-size: 14px;
