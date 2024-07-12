@@ -177,7 +177,6 @@ function Dashboard() {
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Option</th>
                       <th>Source</th>
                       <th>Option</th>
                       <th>Timestamp</th>
@@ -187,7 +186,7 @@ function Dashboard() {
                     {result.data.map((item) => (
                       <tr key={item.id}>
                         <td>{item.id}</td>
-                        <td>{item.option}</td>
+     
                         <td>{item.source}</td>
                         <td>{item.option}</td>
                         <td>
