@@ -3,6 +3,8 @@ import { collection, getDocs } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
 import { db } from "./firebaseConfig";
 import styles from "./Dashboard.module.css";
+import NavBar from "./NavBar";
+
 
 const correctAnswers = {
   "q19large.gif": "q19e.gif",
@@ -176,14 +178,16 @@ function Dashboard() {
   };
 
   return (
+    <div><NavBar/>
     <div className={styles.dashboard}>
       <div className={styles.header}>
+        
         <div className={styles.welcome}>
           Welcome, {getAuth().currentUser?.email || "User"}
         </div>
-        <button className={styles.logoutButton} onClick={handleLogout}>
+        {/* <button className={styles.logoutButton} onClick={handleLogout}>
           Logout
-        </button>
+        </button> */}
       </div>
 
       <h1>Dashboard</h1>
@@ -302,6 +306,7 @@ function Dashboard() {
           </table>
         )}
       </div>
+    </div>
     </div>
   );
 }
