@@ -27,9 +27,49 @@
   padding: 8px 16px;
   cursor: pointer;
   border-radius: 4px;
-
 }
 
 .logoutButton:hover {
   background-color: #D32F2F;
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo {
+    scale: 50%;
+  }
+
+  .profile {
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .logoutButtonContainer {
+    margin-top: 10px;
+    width: 40%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    scale: 40%;
+  }
+
+  .profilePic {
+    width: 30px;
+    height: 30px;
+  }
+
+  .logoutButton {
+    padding: 6px 12px;
+  }
 }

@@ -29,6 +29,13 @@ function NavBar({ logoUrl, onLogout }) {
           className={styles.logo}
         />
       </div>
+      <div className={styles.profile}>
+        <img
+          src={logoUrl}
+          alt="Profile"
+          className={styles.profilePic}
+        />
+      </div>
       <div className={styles.logoutButtonContainer}>
         <button className={styles.logoutButton} onClick={handleLogout}>
           Logout
