@@ -84,14 +84,11 @@ p button:hover {
 }
 
 .rememberMe {
-  display: flex;
+  display: block;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.rememberMe input {
-  margin-right: 10px;
-}
 
 @media (max-width: 768px) {
   .container {
@@ -112,4 +109,18 @@ p button:hover {
     box-shadow: none;
     padding: 10px;
   }
+}
+.card {
+  width: 300px; /* Adjust width as needed */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden; /* Ensure content doesn't overflow */
+}
+
+.card-content {
+  /* Ensure text doesn't overflow and shows ellipsis for long text */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Prevent text from wrapping */
 }

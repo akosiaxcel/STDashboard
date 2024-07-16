@@ -101,7 +101,8 @@ h1 {
 }
 
 .searchButton,
-.clearButton {
+.clearButton,
+.saveButton {
   padding: 10px 20px;
   font-size: 16px;
   color: var(--white);
@@ -234,7 +235,8 @@ h1 {
   }
 
   .searchButton,
-  .clearButton {
+  .clearButton,
+  .saveButton {
     width: auto;
   }
 
@@ -255,7 +257,8 @@ h1 {
 
   .logoutButton,
   .searchButton,
-  .clearButton {
+  .clearButton,
+  .saveButton {
     font-size: 14px;
     padding: 8px 15px;
   }

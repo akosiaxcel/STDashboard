@@ -18,7 +18,9 @@ function SignIn({ onSignUpClick }) {
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     const storedPassword = localStorage.getItem("password");
-    if (storedEmail && storedPassword) {
+    const storedRememberMe = localStorage.getItem("rememberMe");
+
+    if (storedEmail && storedPassword && storedRememberMe === "true") {
       setEmail(storedEmail);
       setPassword(storedPassword);
       setRememberMe(true);
@@ -34,13 +36,24 @@ function SignIn({ onSignUpClick }) {
       if (rememberMe) {
         localStorage.setItem("email", email);
         localStorage.setItem("password", password);
+        localStorage.setItem("rememberMe", "true");
       } else {
         localStorage.removeItem("email");
         localStorage.removeItem("password");
+        localStorage.removeItem("rememberMe");
       }
       // Redirect to dashboard or do something on successful login
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleRememberMeChange = (e) => {
+    setRememberMe(e.target.checked);
+    if (!e.target.checked) {
+      localStorage.removeItem("email");
+      localStorage.removeItem("password");
+      localStorage.removeItem("rememberMe");
     }
   };
 
@@ -82,7 +95,7 @@ function SignIn({ onSignUpClick }) {
               <input
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={handleRememberMeChange}
               />
               <label>Remember Me</label>
             </div>
