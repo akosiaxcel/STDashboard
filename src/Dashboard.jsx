@@ -185,9 +185,6 @@ function Dashboard() {
                 className={styles.searchInput}
               />
             </div>
-            <h6 className={styles.multipleId}>
-              Search multiple IDs by separating them with a comma
-            </h6>
             <button className={styles.searchButton} onClick={handleSearch}>
               Search
             </button>
