@@ -63,21 +63,28 @@ function Dashboard() {
       try {
         const querySnapshot = await getDocs(collection(db, `users/${id}/selectedOptions`));
 
-        if (!querySnapshot.empty) {
-          const dataList = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            timestamp: doc.data().timestamp?.toDate(), // Convert Firestore timestamp to JS Date if it exists
-          }));
-
-          const result = { id, data: dataList };
-          const resultWithStats = calculateResults([result])[0];
-
-          // Automatically save the result if it is valid
-          saveResults(resultWithStats);
+        if (querySnapshot.empty) {
+          setSearchError(`No data found for User ID ${id}.`);
+          clearTimeout(searchErrorTimeout);
+          setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
+          continue; // Skip to the next ID
         }
+
+        const dataList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate(), // Convert Firestore timestamp to JS Date if it exists
+        }));
+
+        const result = { id, data: dataList };
+        const resultWithStats = calculateResults([result])[0];
+
+        // Automatically save the result if it is valid
+        saveResults(resultWithStats);
       } catch (error) {
-        // Handle errors if necessary
+        setSearchError(`Error fetching data for User ID ${id}: ${error.message}`);
+        clearTimeout(searchErrorTimeout);
+        setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
       }
     }
 
