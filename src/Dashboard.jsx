@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { db } from "./firebaseConfig";
 import styles from "./Dashboard.module.css";
+import Spinner from "./Spinner.module.css"; // Import spinner styles
 import NavBar from "./NavBar";
 
+// Define correct answers
 const correctAnswers = {
   "q19large.gif": "q19e.gif",
   "q4large.gif": "q4c.gif",
@@ -15,14 +17,11 @@ const correctAnswers = {
 };
 
 function Dashboard() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchIds, setSearchIds] = useState([]);
   const [searchError, setSearchError] = useState(null);
-  const [searchResult, setSearchResult] = useState([]);
   const [inputValue, setInputValue] = useState("");
-  const [userId, setUserId] = useState(null);
   const [savedResults, setSavedResults] = useState([]);
   const [saveError, setSaveError] = useState(null);
 
@@ -31,40 +30,6 @@ function Dashboard() {
   const [saveErrorTimeout, setSaveErrorTimeout] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        setError("No permissions");
-        setLoading(false);
-        return;
-      }
-
-      const userId = user.uid;
-      setUserId(userId);
-
-      try {
-        const querySnapshot = await getDocs(collection(db, `users/${userId}/selectedOptions`));
-        if (querySnapshot.empty) {
-          setData([]);
-        } else {
-          const dataList = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            timestamp: doc.data().timestamp?.toDate(), // Convert Firestore timestamp to JS Date if it exists
-          }));
-          setData(dataList);
-        }
-      } catch (error) {
-        setError(`Error fetching data: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
     // Load saved results from local storage
     const savedData = JSON.parse(localStorage.getItem("savedResults")) || [];
     setSavedResults(savedData);
@@ -73,6 +38,7 @@ function Dashboard() {
   const handleSearch = async () => {
     if (!inputValue) {
       setSearchError("Please enter a User ID(s)");
+      clearTimeout(searchErrorTimeout);
       setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
       return;
     }
@@ -83,39 +49,44 @@ function Dashboard() {
     const alreadySearchedIds = ids.filter((id) => searchIds.includes(id));
     if (alreadySearchedIds.length > 0) {
       setSearchError(`User ID(s) ${alreadySearchedIds.join(", ")} already searched.`);
+      clearTimeout(searchErrorTimeout);
       setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
       return;
     }
 
     setSearchIds([...searchIds, ...ids]);
 
-    const newResults = [];
+    setLoading(true); // Show loading spinner
+    await new Promise((resolve) => setTimeout(resolve, 250)); // Simulate a delay
 
     for (const id of ids) {
       try {
         const querySnapshot = await getDocs(collection(db, `users/${id}/selectedOptions`));
 
-        if (querySnapshot.empty) {
-          newResults.push({ id, data: [] });
-        } else {
+        if (!querySnapshot.empty) {
           const dataList = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
             timestamp: doc.data().timestamp?.toDate(), // Convert Firestore timestamp to JS Date if it exists
           }));
-          newResults.push({ id, data: dataList });
+
+          const result = { id, data: dataList };
+          const resultWithStats = calculateResults([result])[0];
+
+          // Automatically save the result if it is valid
+          saveResults(resultWithStats);
         }
       } catch (error) {
-        newResults.push({ id, error: error.message });
+        // Handle errors if necessary
       }
     }
 
-    setSearchResult(newResults.concat(searchResult));
+    setLoading(false); // Hide loading spinner
+    setInputValue(""); // Clear search input
   };
 
   const clearSearchResults = () => {
     setSearchIds([]);
-    setSearchResult([]);
   };
 
   const calculateMedian = (numbers) => {
@@ -160,13 +131,12 @@ function Dashboard() {
     });
   };
 
-  const searchResultWithStats = calculateResults(searchResult);
-
   const saveResults = (result) => {
     const isAlreadySaved = savedResults.some((savedResult) => savedResult.id === result.id);
 
     if (isAlreadySaved) {
       setSaveError(`Result for User ID ${result.id} is already saved.`);
+      clearTimeout(saveErrorTimeout);
       setSaveErrorTimeout(setTimeout(() => setSaveError(null), 3000));
       return;
     }
@@ -182,6 +152,16 @@ function Dashboard() {
     setSavedResults(updatedSavedResults);
     localStorage.setItem("savedResults", JSON.stringify(updatedSavedResults));
   };
+
+  // Sort results: first by totalCorrect (descending), then by medianTimeDiff (ascending)
+  const sortedResults = savedResults
+    .slice() // Create a copy to avoid mutating the original array
+    .sort((a, b) => {
+      if (b.totalCorrect !== a.totalCorrect) {
+        return b.totalCorrect - a.totalCorrect; // Sort by totalCorrect descending
+      }
+      return a.medianTimeDiff - b.medianTimeDiff; // Sort by medianTimeDiff ascending
+    });
 
   return (
     <div>
@@ -216,56 +196,14 @@ function Dashboard() {
             </button>
             {searchError && <div className={styles.error}>{searchError}</div>}
           </div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div className={styles.error}>{error}</div>
-          ) : (
-            <div></div>
-          )}
-          {searchResultWithStats.length > 0 && (
-            <div className={styles.searchResult}>
-              {searchResultWithStats.map((result) => (
-                <div key={result.id}>
-                  <div className={styles.resultHeader}>
-                    <h3>User ID: {result.id}</h3>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() =>
-                        setSearchResult(searchResult.filter((r) => r.id !== result.id))
-                      }
-                    >
-                      ×
-                    </button>
-                  </div>
-                  {result.error ? (
-                    <div className={styles.error}>Error: {result.error}</div>
-                  ) : (
-                    <>
-                      <div>
-                        <h4>
-                          Correct Answers: {result.totalCorrect} | Incorrect Answers:{" "}
-                          {result.totalIncorrect} | Median Time: {result.medianTimeDiff} ms
-                        </h4>
-                        <button
-                          className={styles.saveButton}
-                          onClick={() => saveResults(result)}
-                        >
-                          Save Result
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+
+          {loading && <div className={Spinner.spinner}></div>} {/* Render spinner while loading */}
         </div>
 
         <div className={styles.savedResults}>
           <h2>Saved Results</h2>
           {saveError && <div className={styles.error}>{saveError}</div>}
-          {savedResults.length === 0 ? (
+          {sortedResults.length === 0 ? (
             <div>No saved results</div>
           ) : (
             <table className={styles.table}>
@@ -279,7 +217,7 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {savedResults.map((result, index) => (
+                {sortedResults.map((result, index) => (
                   <tr key={index}>
                     <td>{result.id}</td>
                     <td>{result.totalCorrect}</td>
