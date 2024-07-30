@@ -18,16 +18,15 @@ const correctAnswers = {
 
 function Dashboard() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchIds, setSearchIds] = useState([]);
   const [searchError, setSearchError] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(null); // New state for success messages
   const [inputValue, setInputValue] = useState("");
   const [savedResults, setSavedResults] = useState([]);
   const [saveError, setSaveError] = useState(null);
 
-  // State for timeouts
-  const [searchErrorTimeout, setSearchErrorTimeout] = useState(null);
-  const [saveErrorTimeout, setSaveErrorTimeout] = useState(null);
+  // State for input values for notes and edit mode
+  const [inputValues, setInputValues] = useState({});
+  const [editMode, setEditMode] = useState({});
 
   useEffect(() => {
     // Load saved results from local storage
@@ -37,36 +36,23 @@ function Dashboard() {
 
   const handleSearch = async () => {
     if (!inputValue) {
-      setSearchError("Please enter a User ID(s)");
-      clearTimeout(searchErrorTimeout);
-      setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
+      showError("Please enter a User ID(s)");
       return;
     }
 
     const ids = inputValue.split(",").map((id) => id.trim());
-
-    // Check if any of the IDs are already searched
-    const alreadySearchedIds = ids.filter((id) => searchIds.includes(id));
-    if (alreadySearchedIds.length > 0) {
-      setSearchError(`User ID(s) ${alreadySearchedIds.join(", ")} already searched.`);
-      clearTimeout(searchErrorTimeout);
-      setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
-      return;
-    }
-
-    setSearchIds([...searchIds, ...ids]);
 
     setLoading(true); // Show loading spinner
     await new Promise((resolve) => setTimeout(resolve, 250)); // Simulate a delay
 
     for (const id of ids) {
       try {
-        const querySnapshot = await getDocs(collection(db, `users/${id}/selectedOptions`));
+        const querySnapshot = await getDocs(
+          collection(db, `users/${id}/selectedOptions`)
+        );
 
         if (querySnapshot.empty) {
-          setSearchError(`No data found for User ID ${id}.`);
-          clearTimeout(searchErrorTimeout);
-          setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
+          showError(`No data found for User ID ${id}.`);
           continue; // Skip to the next ID
         }
 
@@ -82,9 +68,7 @@ function Dashboard() {
         // Automatically save the result if it is valid
         saveResults(resultWithStats);
       } catch (error) {
-        setSearchError(`Error fetching data for User ID ${id}: ${error.message}`);
-        clearTimeout(searchErrorTimeout);
-        setSearchErrorTimeout(setTimeout(() => setSearchError(null), 3000));
+        showError(`Error fetching data for User ID ${id}: ${error.message}`);
       }
     }
 
@@ -92,8 +76,14 @@ function Dashboard() {
     setInputValue(""); // Clear search input
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const clearSearchResults = () => {
-    setSearchIds([]);
+    setInputValue(""); // Clear input field
   };
 
   const calculateMedian = (numbers) => {
@@ -114,7 +104,9 @@ function Dashboard() {
       let incorrectCount = 0;
       const timeDiffs = [];
 
-      const timestamps = result.data.map((selectedOption) => new Date(selectedOption.timestamp)).sort((a, b) => a - b);
+      const timestamps = result.data
+        .map((selectedOption) => new Date(selectedOption.timestamp))
+        .sort((a, b) => a - b);
 
       for (let i = 1; i < timestamps.length; i++) {
         const timeDiff = timestamps[i] - timestamps[i - 1];
@@ -134,17 +126,22 @@ function Dashboard() {
 
       const medianTimeDiff = calculateMedian(timeDiffs);
 
-      return { ...result, totalCorrect: correctCount, totalIncorrect: incorrectCount, medianTimeDiff };
+      return {
+        ...result,
+        totalCorrect: correctCount,
+        totalIncorrect: incorrectCount,
+        medianTimeDiff,
+      };
     });
   };
 
   const saveResults = (result) => {
-    const isAlreadySaved = savedResults.some((savedResult) => savedResult.id === result.id);
+    const isAlreadySaved = savedResults.some(
+      (savedResult) => savedResult.id === result.id
+    );
 
     if (isAlreadySaved) {
-      setSaveError(`Result for User ID ${result.id} is already saved.`);
-      clearTimeout(saveErrorTimeout);
-      setSaveErrorTimeout(setTimeout(() => setSaveError(null), 3000));
+      showError(`Result for User ID ${result.id} is already saved.`);
       return;
     }
 
@@ -152,12 +149,62 @@ function Dashboard() {
     setSavedResults(updatedSavedResults);
     localStorage.setItem("savedResults", JSON.stringify(updatedSavedResults));
     setSaveError(null); // Clear any previous save error
+    setSaveSuccess(`Saved result for User ID ${result.id}`); // Set success message
+
+    // Clear success message after 6000ms
+    setTimeout(() => {
+      setSaveSuccess(null);
+    }, 6000);
   };
 
-  const deleteSavedResult = (index) => {
-    const updatedSavedResults = savedResults.filter((_, i) => i !== index);
+  const deleteSavedResult = (id) => {
+    try {
+      // Filter out the result with the specified ID
+      const updatedSavedResults = savedResults.filter(
+        (result) => result.id !== id
+      );
+
+      // Update state and local storage
+      setSavedResults(updatedSavedResults);
+      localStorage.setItem("savedResults", JSON.stringify(updatedSavedResults));
+
+      // Clear any previous save error
+      setSaveError(null);
+    } catch (error) {
+      showError(`Error deleting result: ${error.message}`);
+    }
+  };
+
+  const saveInputValue = (id) => {
+    const currentNote = savedResults.find(result => result.id === id)?.note || "";
+    const note = inputValues[id] !== undefined ? inputValues[id] : currentNote;
+
+    const updatedSavedResults = savedResults.map((result) =>
+      result.id === id ? { ...result, note } : result
+    );
+
     setSavedResults(updatedSavedResults);
     localStorage.setItem("savedResults", JSON.stringify(updatedSavedResults));
+    setInputValues({ ...inputValues, [id]: "" }); // Clear the input field after saving
+    setEditMode({ ...editMode, [id]: false }); // Exit edit mode after saving
+    setSaveSuccess(`Saved note for User ID ${id}`); // Set success message
+
+    // Clear success message after 6000ms
+    setTimeout(() => {
+      setSaveSuccess(null);
+    }, 6000);
+  };
+
+  const cancelEdit = (id) => {
+    setInputValues({ ...inputValues, [id]: "" }); // Clear the input field
+    setEditMode({ ...editMode, [id]: false }); // Exit edit mode
+  };
+
+  const showError = (message) => {
+    setSearchError(message);
+    setTimeout(() => {
+      setSearchError(null);
+    }, 6000); // Show for 6 seconds
   };
 
   // Sort results: first by totalCorrect (descending), then by medianTimeDiff (ascending)
@@ -190,6 +237,7 @@ function Dashboard() {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Enter User ID"
                 className={styles.searchInput}
+                onKeyDown={handleKeyDown} // Add onKeyDown event handler
               />
             </div>
             <button className={styles.searchButton} onClick={handleSearch}>
@@ -198,15 +246,28 @@ function Dashboard() {
             <button className={styles.clearButton} onClick={clearSearchResults}>
               Clear
             </button>
-            {searchError && <div className={styles.error}>{searchError}</div>}
+            {searchError && (
+              <div className={`${styles.error} ${styles["error-pop-in"]}`}>
+                {searchError}
+              </div>
+            )}
+            {saveSuccess && (
+              <div className={`${styles.success} ${styles["success-pop-in"]}`}>
+                {saveSuccess}
+              </div>
+            )}
           </div>
-
-          {loading && <div className={Spinner.spinner}></div>} {/* Render spinner while loading */}
+          {loading && <div className={Spinner.spinner}></div>}{" "}
+          {/* Render spinner while loading */}
         </div>
 
         <div className={styles.savedResults}>
           <h2>Saved Results</h2>
-          {saveError && <div className={styles.error}>{saveError}</div>}
+          {saveError && (
+            <div className={`${styles.error} ${styles["error-pop-in"]}`}>
+              {saveError}
+            </div>
+          )}
           {sortedResults.length === 0 ? (
             <div>No saved results</div>
           ) : (
@@ -217,20 +278,62 @@ function Dashboard() {
                   <th>Number of Correct Answers</th>
                   <th>Number of Incorrect Answers</th>
                   <th>Median Time (ms)</th>
-                  <th>Actions</th>
+                  <th>Note</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {sortedResults.map((result, index) => (
-                  <tr key={index}>
+                {sortedResults.map((result) => (
+                  <tr key={result.id}>
                     <td>{result.id}</td>
                     <td>{result.totalCorrect}</td>
                     <td>{result.totalIncorrect}</td>
                     <td>{result.medianTimeDiff}</td>
                     <td>
+                      {editMode[result.id] ? (
+                        <>
+                          <input
+                            type="text"
+                            value={inputValues[result.id] !== undefined ? inputValues[result.id] : result.note || ""}
+                            onChange={(e) =>
+                              setInputValues({
+                                ...inputValues,
+                                [result.id]: e.target.value,
+                              })
+                            }
+                            placeholder="Enter note"
+                          />
+                          <button
+                            className={styles.saveNoteButton}
+                            onClick={() => saveInputValue(result.id)}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className={styles.cancelButton}
+                            onClick={() => cancelEdit(result.id)}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {result.note || ""}
+                          <button
+                            className={styles.editButton}
+                            onClick={() =>
+                              setEditMode({ ...editMode, [result.id]: true })
+                            }
+                          >
+                            ✏️
+                          </button>
+                        </>
+                      )}
+                    </td>
+                    <td>
                       <button
                         className={styles.deleteButton}
-                        onClick={() => deleteSavedResult(index)}
+                        onClick={() => deleteSavedResult(result.id)}
                       >
                         Delete
                       </button>
