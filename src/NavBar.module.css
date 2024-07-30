@@ -8,6 +8,7 @@
   padding: 0 20px; /* Optional: Add some horizontal padding */
   background-color: #f8f9fa; /* Optional: Set background color */
   border-bottom: 1px solid #ddd; /* Optional: Add a bottom border */
+  box-shadow: 0 4px 12px #0000001a;
 }
 
 .logo {
