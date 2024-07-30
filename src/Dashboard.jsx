@@ -36,16 +36,24 @@ function Dashboard() {
 
   const handleSearch = async () => {
     if (!inputValue) {
-      showError("Please enter a User ID(s)");
+      showError("Please enter a User ID");
       return;
     }
 
     const ids = inputValue.split(",").map((id) => id.trim());
-
     setLoading(true); // Show loading spinner
     await new Promise((resolve) => setTimeout(resolve, 250)); // Simulate a delay
 
     for (const id of ids) {
+      // Check if the ID is already present in savedResults
+      const resultExists = savedResults.some(result => result.id === id);
+
+      if (resultExists) {
+        showError(`Result for User ID ${id} is already saved.`);
+        continue; // Skip to the next ID
+      }
+
+      // Fetch data if the ID is not already saved
       try {
         const querySnapshot = await getDocs(
           collection(db, `users/${id}/selectedOptions`)
@@ -76,14 +84,11 @@ function Dashboard() {
     setInputValue(""); // Clear search input
   };
 
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleSearch();
     }
-  };
-
-  const clearSearchResults = () => {
-    setInputValue(""); // Clear input field
   };
 
   const calculateMedian = (numbers) => {
@@ -136,15 +141,6 @@ function Dashboard() {
   };
 
   const saveResults = (result) => {
-    const isAlreadySaved = savedResults.some(
-      (savedResult) => savedResult.id === result.id
-    );
-
-    if (isAlreadySaved) {
-      showError(`Result for User ID ${result.id} is already saved.`);
-      return;
-    }
-
     const updatedSavedResults = [...savedResults, result];
     setSavedResults(updatedSavedResults);
     localStorage.setItem("savedResults", JSON.stringify(updatedSavedResults));
@@ -241,10 +237,7 @@ function Dashboard() {
               />
             </div>
             <button className={styles.searchButton} onClick={handleSearch}>
-              Search
-            </button>
-            <button className={styles.clearButton} onClick={clearSearchResults}>
-              Clear
+              🔎︎ Search
             </button>
             {searchError && (
               <div className={`${styles.error} ${styles["error-pop-in"]}`}>
@@ -319,13 +312,13 @@ function Dashboard() {
                       ) : (
                         <>
                           {result.note || ""}
-                          <button
+                          <button 
                             className={styles.editButton}
                             onClick={() =>
                               setEditMode({ ...editMode, [result.id]: true })
                             }
                           >
-                            ✏️
+                            ✎
                           </button>
                         </>
                       )}
@@ -335,7 +328,7 @@ function Dashboard() {
                         className={styles.deleteButton}
                         onClick={() => deleteSavedResult(result.id)}
                       >
-                        Delete
+                        ✖
                       </button>
                     </td>
                   </tr>

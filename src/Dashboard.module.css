@@ -40,21 +40,6 @@ body {
   color: var(--text-color);
 }
 
-.logoutButton {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  width: 16%;
-}
-
-.logoutButton:hover {
-  background-color: var(--secondary-color);
-}
 
 h1 {
   color: var(--primary-color);
@@ -84,6 +69,7 @@ h1 {
   border-radius: 5px;
   width: 100%;
   padding-right: 30px; /* Add padding to the right for the clear button */
+  border: 1px solid #69727d;
 }
 
 .clearInputButton {
@@ -107,7 +93,7 @@ h1 {
   font-size: 16px;
   color: var(--white);
   border: none;
-  border-radius: 5px;
+  border-radius: 8px 8px 8px 8px;
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 10px;
@@ -119,6 +105,20 @@ h1 {
 }
 
 .searchButton:hover {
+  background-color: var(--secondary-color);
+}
+.saveNoteButton {
+  background-color: var(--primary-color);
+}
+
+.saveNoteButton:hover {
+  background-color: var(--secondary-color);
+}
+.cancelButton {
+  background-color: var(--error-color);
+}
+
+.cancelButton:hover {
   background-color: var(--secondary-color);
 }
 

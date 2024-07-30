@@ -1,75 +1,43 @@
+/* NavBar.module.css */
+
 .navbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  align-items: center; /* Centers items vertically */
+  justify-content: space-between; /* Space out left and right contents */
+  height: 100px; /* Adjust height to make navbar thinner */
+  padding: 0 20px; /* Optional: Add some horizontal padding */
+  background-color: #f8f9fa; /* Optional: Set background color */
+  border-bottom: 1px solid #ddd; /* Optional: Add a bottom border */
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  scale: 55%;
+  height: 70px; /* Adjust logo size to fit the thinner navbar */
+  margin-left: 80%;
 }
 
-.profilePic {
-  width: 40px; /* Adjust size as needed */
-  height: 40px; /* Adjust size as needed */
-  border-radius: 50%;
-  margin-right: 10px;
+.logoutButtonContainer {
+  /* Adjust any padding or margins if needed */
 }
 
 .logoutButton {
-  background-color: #FF6347; 
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 4px;
+  background-color: #4E4EF2;
+  color: white; /* Optional: Set button text color */
+  border: none; /* Remove border */
+  padding: 5px 10px; /* Adjust padding to make button fit well */
+  border-radius: 8px 8px 8px 8px;
+  cursor: pointer; /* Change cursor on hover */
 }
 
 .logoutButton:hover {
-  background-color: #D32F2F;
+  background-color: #0056b3; /* Optional: Darker color on hover */
 }
 
-/* Media Queries for Mobile Responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+    height: 70px; /* Adjust height for smaller screens */
   }
 
   .logo {
-    scale: 50%;
-  }
-
-  .profile {
-    margin-top: 10px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .logoutButtonContainer {
-    margin-top: 10px;
-    width: 40%;
-    display: flex;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo {
-    scale: 40%;
-  }
-
-  .profilePic {
-    width: 30px;
-    height: 30px;
-  }
-
-  .logoutButton {
-    padding: 6px 12px;
+    height: 50px; /* Adjust logo size for smaller screens */
   }
 }

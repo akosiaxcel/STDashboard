@@ -1,15 +1,9 @@
 import React from "react";
 import { getAuth, signOut } from "firebase/auth";
-import { Link as MuiLink, Typography } from "@mui/material";
-import { styled } from "@mui/system";
 import styles from "./NavBar.module.css";
 
-const CustomLink = styled(MuiLink)({
-  textDecoration: "none",
-  color: "inherit",
-});
 
-function NavBar({ logoUrl, onLogout }) {
+function NavBar({ onLogout }) {
   const handleLogout = async () => {
     const auth = getAuth();
     try {
