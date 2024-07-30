@@ -1,44 +1,93 @@
-/* NavBar.module.css */
-
 .navbar {
   display: flex;
-  align-items: center; /* Centers items vertically */
-  justify-content: space-between; /* Space out left and right contents */
-  height: 100px; /* Adjust height to make navbar thinner */
-  padding: 0 20px; /* Optional: Add some horizontal padding */
-  background-color: #f8f9fa; /* Optional: Set background color */
-  border-bottom: 1px solid #ddd; /* Optional: Add a bottom border */
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding: 0 50px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
   box-shadow: 0 4px 12px #0000001a;
 }
 
 .logo {
-  height: 70px; /* Adjust logo size to fit the thinner navbar */
-  margin-left: 80%;
+  height: 70px;
+  margin-left: 20%;
 }
 
-.logoutButtonContainer {
-  /* Adjust any padding or margins if needed */
-}
+.logoutButtonContainer {}
 
 .logoutButton {
   background-color: #4E4EF2;
-  color: white; /* Optional: Set button text color */
-  border: none; /* Remove border */
-  padding: 5px 10px; /* Adjust padding to make button fit well */
-  border-radius: 8px 8px 8px 8px;
-  cursor: pointer; /* Change cursor on hover */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .logoutButton:hover {
-  background-color: #0056b3; /* Optional: Darker color on hover */
+  background-color: #0056b3;
+}
+
+.menuIcon {
+  display: none;
+  font-size: 30px;
+  cursor: pointer;
 }
 
 @media (max-width: 600px) {
   .navbar {
-    height: 70px; /* Adjust height for smaller screens */
+    height: 70px;
   }
 
   .logo {
-    height: 50px; /* Adjust logo size for smaller screens */
+    height: 50px;
+    margin-left: 10%;
   }
+
+  .menuIcon {
+    display: block;
+  }
+
+  .logoutButtonContainer {
+    display: none;
+  }
+}
+
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidebar.open {
+  width: 250px;
+}
+
+.sidebar a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
 }
